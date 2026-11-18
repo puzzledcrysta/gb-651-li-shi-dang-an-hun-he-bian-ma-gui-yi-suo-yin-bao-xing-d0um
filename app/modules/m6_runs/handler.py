@@ -10,10 +10,10 @@ def page(request: Request):
 
 @router.get("/api/runs")
 def runs(request: Request):
-    execute({"store": request.app.state.store})
+    # 只读取批次，不因查看而新增记录。
     return {"runs": request.app.state.store.all()}
 
 @router.get("/api/export/evidence.csv")
 def export(request: Request):
     data = execute({"store": request.app.state.store})
-    return Response(data["csv"], media_type="text/csv", headers={"Content-Disposition": "attachment; filename=evidence.csv"})
+    return Response(data["csv"], media_type="text/csv; charset=utf-8", headers={"Content-Disposition": "attachment; filename=evidence.csv"})

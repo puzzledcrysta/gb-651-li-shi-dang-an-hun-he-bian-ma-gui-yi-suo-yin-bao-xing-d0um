@@ -23,8 +23,8 @@
 | TRAP-02 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m2_encoding/core.py` | `tests/test_m2_encoding.py::test_trap_1` |
 | TRAP-03 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m3_fields/core.py` | `tests/test_m3_fields.py::test_trap_1` |
 | TRAP-04 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m4_content/core.py` | `tests/test_m4_content.py::test_trap_1` |
-| TRAP-05 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m5_reconcile/core.py` | `tests/test_m5_reconcile.py::test_trap_1` |
-| TRAP-07 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m6_runs/core.py` | `tests/test_m6_runs.py::test_trap_1` |
+| TRAP-05 | 档号相同、题名写法不同 | 直接比对原题名判冲突，或用 NFKC 归一后判同一份 | 只折叠空白与全半角；兼容字符差异留 `REVIEW` 并保留两侧原题名 | `app/modules/m5_reconcile/core.py` | `tests/test_m5_reconcile.py::test_circled_number_is_uncertain_and_keeps_both_raw_titles` |
+| TRAP-07 | 同一材料重跑对账/重复导出 | 每次调用都写一条批次 | 摘要相同复用原 `run_id`；导出只读最近对账批次，不写批次 | `app/modules/m6_runs/core.py` | `tests/test_m6_runs.py::test_rerun_reconcile_same_material_does_not_add_batch` |
 | TRAP-08 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m1_intake/core.py` | `tests/test_m1_intake.py::test_trap_2` |
 | TRAP-09 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m2_encoding/core.py` | `tests/test_m2_encoding.py::test_trap_2` |
 | TRAP-16 | 真实边界输入 | 朴素处理会错分 | 保留证据并稳定裁决 | `app/modules/m3_fields/core.py` | `tests/test_m3_fields.py::test_trap_2` |
@@ -35,6 +35,9 @@
         - 输入记录数 = 有效记录数 + 隔离记录数 + 空记录数。
         - 核心数值或事件数在转换、判定和导出之间保持守恒。
         - 同一输入摘要重跑复用原运行编号，不增加结果行。
+        - 档号逐字匹配；题名仅折叠空白与全半角宽度，不使用 NFKC。
+        - 差异分类 `SAME` / `STYLE` / `REVIEW` / `MISSING` / `ORPHAN`，每条证据同时保留两侧原题名与归一题名。
+        - 导出沿用对账批次的 `run_id`，查看页面与导出都不新增批次。
 
         ## 已知不覆盖
 

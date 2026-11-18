@@ -28,3 +28,9 @@ class Store:
         with self.connect() as db:
             rows = db.execute("SELECT run_id, digest, result FROM runs ORDER BY run_id").fetchall()
         return [{"run_id": r[0], "digest": r[1], "result": json.loads(r[2])} for r in rows]
+
+    def recent(self) -> list[dict]:
+        """按写入顺序返回批次，最后一条是最近一次。"""
+        with self.connect() as db:
+            rows = db.execute("SELECT run_id, digest, result FROM runs ORDER BY rowid").fetchall()
+        return [{"run_id": r[0], "digest": r[1], "result": json.loads(r[2])} for r in rows]
